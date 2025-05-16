@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sharky Aprende - Juego Matemático</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header>¡A Jugar con Sharky!</header>
+  <main>
+    <div id="infoAlumno"></div>
+    <div class="juego-placeholder">
+      <p> Aquí aparecerán los juegos interactivos de matemáticas con arrastrar, unir y más.</p>
+    </div>
+  </main>
+  <script>
+    // Mostrar informacion del alumno
+    const alumno = JSON.parse(localStorage.getItem("sharkyEstudiante") || "null");
+    if(alumno) {
+      document.getElementById('infoAlumno').innerHTML =
+        `<div style="display:flex; align-items:center; gap:18px;">
+          <img src="${alumno.avatar}" alt="Avatar" style="width:70px; height:70px; border-radius:50%;">
+          <div>
+            <b>${alumno.nombre}</b><br/>${alumno.grado}
+          </div>
+        </div>`;
+    }
+  </script>
+</body>
+</html>
