@@ -1,0 +1,294 @@
+/* ===== ESTILOS PARA ANALÍTICAS AVANZADAS ===== */
+
+/* Filtros de analíticas */
+.analytics-filters {
+  display: flex;
+  gap: clamp(15px, 2.5vw, 20px);
+  margin-bottom: clamp(20px, 3vw, 30px);
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(5px, 1vw, 8px);
+  min-width: clamp(150px, 20vw, 200px);
+}
+
+.filter-group label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+  font-weight: 500;
+}
+
+.filter-group select {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(10px, 2vw, 15px);
+  color: #fff;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.filter-group option {
+  background: #1a1a2e;
+  color: #fff;
+}
+
+/* Contenedores de gráficos de analíticas */
+.analytics-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(300px, 45vw, 500px), 1fr));
+  gap: clamp(20px, 3vw, 30px);
+  margin-bottom: clamp(30px, 4vw, 40px);
+}
+
+.analytics-chart-container {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: clamp(12px, 2vw, 16px);
+  padding: clamp(20px, 3vw, 25px);
+  backdrop-filter: blur(15px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  height: clamp(350px, 50vh, 450px);
+}
+
+.analytics-chart-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.analytics-chart-container:hover::before {
+  left: 100%;
+}
+
+.analytics-chart-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.analytics-chart-container h3 {
+  color: #fff;
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  margin: 0 0 clamp(15px, 2.5vw, 20px) 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Métricas detalladas */
+.detailed-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(300px, 45vw, 500px), 1fr));
+  gap: clamp(20px, 3vw, 30px);
+}
+
+.metric-box {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: clamp(12px, 2vw, 16px);
+  padding: clamp(20px, 3vw, 25px);
+  backdrop-filter: blur(15px);
+  transition: all 0.3s ease;
+}
+
+.metric-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.metric-box h4 {
+  color: #fff;
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  margin: 0 0 clamp(15px, 2.5vw, 20px) 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Grid de estadísticas de rendimiento */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(120px, 20vw, 150px), 1fr));
+  gap: clamp(10px, 2vw, 15px);
+}
+
+.stats-grid .stat-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(12px, 2vw, 15px);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stats-grid .stat-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.stats-grid .stat-label {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: clamp(0.75rem, 1.6vw, 0.85rem);
+  margin-bottom: clamp(5px, 1vw, 8px);
+  font-weight: 500;
+}
+
+.stats-grid .stat-value {
+  display: block;
+  color: #fff;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-weight: 600;
+}
+
+/* Análisis de tiempo */
+.time-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(120px, 20vw, 150px), 1fr));
+  gap: clamp(10px, 2vw, 15px);
+  margin-bottom: clamp(20px, 3vw, 30px);
+}
+
+.time-stat-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(12px, 2vw, 15px);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.time-stat-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.time-stat-item .stat-label {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: clamp(0.75rem, 1.6vw, 0.85rem);
+  margin-bottom: clamp(5px, 1vw, 8px);
+  font-weight: 500;
+}
+
+.time-stat-item .stat-value {
+  display: block;
+  color: #fff;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-weight: 600;
+}
+
+/* Secciones de análisis de tiempo */
+.time-analysis-section {
+  margin-bottom: clamp(25px, 4vw, 35px);
+}
+
+.time-analysis-section h5 {
+  color: #fff;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  margin: 0 0 clamp(15px, 2.5vw, 20px) 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+.hourly-chart-container,
+.daily-chart-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(8px, 1.5vw, 12px);
+  padding: clamp(15px, 2.5vw, 20px);
+  height: clamp(250px, 35vh, 300px);
+  position: relative;
+}
+
+/* Responsive para analíticas */
+@media (max-width: 768px) {
+  .analytics-filters {
+    flex-direction: column;
+    gap: clamp(10px, 2vw, 15px);
+  }
+  
+  .filter-group {
+    min-width: 100%;
+  }
+  
+  .analytics-charts {
+    grid-template-columns: 1fr;
+    gap: clamp(15px, 2.5vw, 20px);
+  }
+  
+  .detailed-metrics {
+    grid-template-columns: 1fr;
+    gap: clamp(15px, 2.5vw, 20px);
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(8px, 1.5vw, 12px);
+  }
+  
+  .time-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(8px, 1.5vw, 12px);
+  }
+  
+  .analytics-chart-container {
+    height: clamp(300px, 45vh, 350px);
+  }
+  
+  .hourly-chart-container,
+  .daily-chart-container {
+    height: clamp(200px, 30vh, 250px);
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics-filters {
+    gap: clamp(8px, 1.5vw, 12px);
+  }
+  
+  .filter-group select {
+    padding: clamp(8px, 1.5vw, 12px);
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+  }
+  
+  .analytics-chart-container {
+    padding: clamp(15px, 2.5vw, 20px);
+    height: clamp(250px, 40vh, 300px);
+  }
+  
+  .metric-box {
+    padding: clamp(15px, 2.5vw, 20px);
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: clamp(6px, 1.2vw, 10px);
+  }
+  
+  .time-stats-grid {
+    grid-template-columns: 1fr;
+    gap: clamp(6px, 1.2vw, 10px);
+  }
+  
+  .hourly-chart-container,
+  .daily-chart-container {
+    height: clamp(180px, 25vh, 220px);
+    padding: clamp(10px, 2vw, 15px);
+  }
+} 

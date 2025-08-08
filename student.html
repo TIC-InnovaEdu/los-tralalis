@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Estudiante - Shark Learns</title>
+    <link rel="stylesheet" href="css/student.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="student-body">
+    <!-- Header del Panel Estudiante -->
+    <header class="student-header">
+      <div class="header-content">
+        <div class="logo-section">
+          <img src="img/shark-logo.png" alt="Shark Logo" class="header-logo" />
+          <h1>🦈 Shark Learns - Mi Panel</h1>
+        </div>
+        <div class="user-section">
+          <span class="welcome-text"
+            >Hola, <span id="student-name">Estudiante</span></span
+          >
+          <button id="logout-btn" class="logout-btn">🚪 Cerrar Sesión</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="student-main">
+      <!-- Sección de Bienvenida y Estadísticas -->
+      <section class="welcome-section">
+        <div class="welcome-card">
+          <div class="welcome-content">
+            <h2>🌊 ¡Bienvenido de vuelta!</h2>
+            <p>¿Listo para una nueva aventura matemática?</p>
+            <button class="play-btn" onclick="startGame()">
+              🎮 ¡Jugar Ahora!
+            </button>
+          </div>
+          <div class="shark-animation">
+            <div class="swimming-shark">🦈</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Estadísticas del Estudiante -->
+      <section class="stats-section">
+        <h3>📊 Mis Estadísticas</h3>
+        <div class="student-stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🎮</div>
+            <div class="stat-content">
+              <h4>Partidas Jugadas</h4>
+              <p class="stat-number" id="total-games">-</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-content">
+              <h4>Mejor Puntuación</h4>
+              <p class="stat-number" id="best-score">-</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-content">
+              <h4>Promedio</h4>
+              <p class="stat-number" id="avg-score">-</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-content">
+              <h4>Precisión</h4>
+              <p class="stat-number" id="accuracy">-</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Historial de Partidas -->
+      <section class="history-section">
+        <div class="section-header">
+          <h3>🕒 Mis Últimas Partidas</h3>
+          <button id="refresh-history" class="refresh-btn">
+            🔄 Actualizar
+          </button>
+        </div>
+        <div class="games-container">
+          <div id="games-list" class="games-list">
+            <!-- Las partidas se cargarán dinámicamente -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Perfil del Estudiante -->
+      <section class="profile-section">
+        <h3>👤 Mi Perfil</h3>
+        <div class="profile-card">
+          <div class="profile-info">
+            <p><strong>📧 Email:</strong> <span id="student-email">-</span></p>
+            <p>
+              <strong>📅 Registrado:</strong>
+              <span id="registration-date">-</span>
+            </p>
+            <p>
+              <strong>🎖️ Nivel:</strong>
+              <span id="student-level">Principiante</span>
+            </p>
+          </div>
+          <div class="profile-actions">
+            <button class="profile-btn" onclick="editProfile()">
+              ✏️ Editar Perfil
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="loading-spinner">
+        <div class="shark-loading">🦈</div>
+        <p>Cargando...</p>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/student.js"></script>
+  </body>
+</html>

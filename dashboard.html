@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Profesor - Shark Learns</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/analytics.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body class="dashboard-body">
+    <!-- Header del Dashboard -->
+    <header class="dashboard-header">
+      <div class="header-content">
+        <div class="logo-section">
+          <img src="img/shark-logo.png" alt="Shark Logo" class="header-logo" />
+          <h1>🦈 Shark Learns - Dashboard</h1>
+        </div>
+        <div class="user-section">
+          <span class="welcome-text"
+            >Bienvenido, <span id="teacher-name">Profesor</span></span
+          >
+          <button id="logout-btn" class="logout-btn">🚪 Cerrar Sesión</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navegación del Dashboard -->
+    <nav class="dashboard-nav">
+      <div class="nav-content">
+        <button class="nav-btn active" data-section="overview">
+          📊 Resumen
+        </button>
+        <button class="nav-btn" data-section="students">👥 Estudiantes</button>
+        <button class="nav-btn" data-section="ranking">🏆 Ranking</button>
+        <button class="nav-btn" data-section="levels">
+          ⭐ Niveles & Logros
+        </button>
+        <button class="nav-btn" data-section="analytics">📈 Analíticas</button>
+      </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="dashboard-main">
+      <!-- Sección: Resumen -->
+      <section id="overview-section" class="dashboard-section active">
+        <div class="section-header">
+          <h2>📊 Resumen General</h2>
+          <button id="refresh-overview" class="refresh-btn">
+            🔄 Actualizar
+          </button>
+        </div>
+
+        <!-- Tarjetas de Estadísticas -->
+        <div class="stats-grid">
+          <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+              <h3>Total Estudiantes</h3>
+              <p class="stat-number" id="total-students">-</p>
+            </div>
+          </div>
+          <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="stat-icon">🎮</div>
+            <div class="stat-content">
+              <h3>Partidas Jugadas</h3>
+              <p class="stat-number" id="total-games">-</p>
+            </div>
+          </div>
+          <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+              <h3>Promedio General</h3>
+              <p class="stat-number" id="average-score">-</p>
+            </div>
+          </div>
+          <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+              <h3>Precisión Media</h3>
+              <p class="stat-number" id="average-accuracy">-</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráficos de Resumen -->
+        <div class="charts-grid">
+          <div class="chart-container">
+            <h3>📈 Progreso Semanal</h3>
+            <div class="chart-wrapper">
+              <canvas id="weekly-progress-chart"></canvas>
+            </div>
+          </div>
+          <div class="chart-container">
+            <h3>🎯 Distribución de Puntuaciones</h3>
+            <div class="chart-wrapper">
+              <canvas id="score-distribution-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección: Estudiantes -->
+      <section id="students-section" class="dashboard-section">
+        <div class="section-header">
+          <h2>👥 Gestión de Estudiantes</h2>
+          <div class="section-controls">
+            <div class="search-container">
+              <input
+                type="text"
+                id="student-search"
+                placeholder="🔍 Buscar estudiante..."
+              />
+              <div class="search-icon">🔍</div>
+            </div>
+
+            <button id="refresh-students" class="refresh-btn">
+              🔄 Actualizar
+            </button>
+          </div>
+        </div>
+
+        <!-- Estadísticas Rápidas de Estudiantes -->
+        <div class="students-overview">
+          <div class="overview-card">
+            <div class="overview-icon">🎓</div>
+            <div class="overview-content">
+              <h4>Estudiantes Activos</h4>
+              <span id="active-students-count">-</span>
+            </div>
+          </div>
+          <div class="overview-card">
+            <div class="overview-icon">⭐</div>
+            <div class="overview-content">
+              <h4>Promedio General</h4>
+              <span id="students-avg-score">-</span>
+            </div>
+          </div>
+          <div class="overview-card">
+            <div class="overview-icon">🏆</div>
+            <div class="overview-content">
+              <h4>Mejor Estudiante</h4>
+              <span id="top-student-name">-</span>
+            </div>
+          </div>
+          <div class="overview-card">
+            <div class="overview-icon">📈</div>
+            <div class="overview-content">
+              <h4>Progreso Total</h4>
+              <span id="total-progress">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista/Grid de Estudiantes -->
+        <div class="students-container">
+          <div id="students-list" class="students-grid">
+            <!-- Los estudiantes se cargarán dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Modal de Detalles del Estudiante -->
+        <div id="student-modal" class="modal">
+          <div class="modal-content student-modal-content">
+            <div class="modal-header">
+              <div class="student-avatar">👨‍🎓</div>
+              <div class="modal-title-section">
+                <h3 id="student-modal-title">Detalles del Estudiante</h3>
+                <p id="student-modal-subtitle">Estadísticas detalladas</p>
+              </div>
+              <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="student-modal-body">
+              <!-- Contenido del modal se carga dinámicamente -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección: Ranking -->
+      <section id="ranking-section" class="dashboard-section">
+        <div class="section-header">
+          <h2>🏆 Ranking de Estudiantes</h2>
+          <div class="ranking-controls">
+            <div class="period-selector">
+              <select id="ranking-period">
+                <option value="all">🌍 Todo el tiempo</option>
+                <option value="week">📅 Esta semana</option>
+                <option value="month">📆 Este mes</option>
+              </select>
+            </div>
+            <button id="refresh-ranking" class="refresh-btn">
+              🔄 Actualizar
+            </button>
+          </div>
+        </div>
+
+        <!-- Top 3 Podium Moderno -->
+        <div class="podium-modern-container">
+          <div class="podium-header">
+            <h3>🎖️ TOP 3 ESTUDIANTES</h3>
+            <div class="podium-sparkles">✨</div>
+          </div>
+          <div class="podium-modern">
+            <div class="podium-place modern-second">
+              <div class="podium-student-modern" id="second-place">
+                <div class="place-position">2</div>
+                <div class="place-medal">🥈</div>
+                <div class="student-avatar">👨‍🎓</div>
+                <div class="student-info">
+                  <h4>-</h4>
+                  <p class="student-score">- pts</p>
+                  <div class="achievement-bar">
+                    <div class="achievement-fill" style="width: 80%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="podium-place modern-first">
+              <div class="podium-student-modern" id="first-place">
+                <div class="place-position">1</div>
+                <div class="place-medal">🥇</div>
+                <div class="student-avatar">👨‍🎓</div>
+                <div class="student-info">
+                  <h4>-</h4>
+                  <p class="student-score">- pts</p>
+                  <div class="achievement-bar">
+                    <div class="achievement-fill" style="width: 100%"></div>
+                  </div>
+                </div>
+                <div class="crown">👑</div>
+              </div>
+            </div>
+            <div class="podium-place modern-third">
+              <div class="podium-student-modern" id="third-place">
+                <div class="place-position">3</div>
+                <div class="place-medal">🥉</div>
+                <div class="student-avatar">👨‍🎓</div>
+                <div class="student-info">
+                  <h4>-</h4>
+                  <p class="student-score">- pts</p>
+                  <div class="achievement-bar">
+                    <div class="achievement-fill" style="width: 60%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ranking Completo Moderno -->
+        <div class="ranking-modern-container">
+          <div class="ranking-header">
+            <h3>📊 Ranking Completo</h3>
+            <div class="ranking-filters">
+              <button class="filter-btn active" data-filter="all">Todos</button>
+              <button class="filter-btn" data-filter="top">Top 10</button>
+              <button class="filter-btn" data-filter="recent">Recientes</button>
+            </div>
+          </div>
+          <div class="ranking-list" id="ranking-list">
+            <!-- Rankings se cargan dinámicamente -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección: Niveles y Logros -->
+      <section id="levels-section" class="dashboard-section">
+        <div class="section-header">
+          <h2>⭐ Gestión de Niveles y Logros</h2>
+          <div class="section-controls">
+            <button id="refresh-levels" class="refresh-btn">
+              🔄 Actualizar
+            </button>
+          </div>
+        </div>
+
+        <!-- Pestañas de Gestión -->
+        <div class="levels-tabs">
+          <button class="tab-btn active" data-tab="levels">📊 Niveles</button>
+          <button class="tab-btn" data-tab="achievements">🏆 Logros</button>
+          <button class="tab-btn" data-tab="rewards">🎁 Premios</button>
+        </div>
+
+        <!-- Contenido de Niveles -->
+        <div class="tab-content active" id="levels-content">
+          <div class="levels-header">
+            <h3>📊 Configuración de Niveles</h3>
+            <button class="add-btn" id="add-level-btn">➕ Agregar Nivel</button>
+          </div>
+
+          <div class="levels-grid" id="levels-grid">
+            <!-- Los niveles se cargan dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Contenido de Logros -->
+        <div class="tab-content" id="achievements-content">
+          <div class="achievements-header">
+            <h3>🏆 Gestión de Logros</h3>
+            <button class="add-btn" id="add-achievement-btn">
+              ➕ Crear Logro
+            </button>
+          </div>
+
+          <div class="achievements-grid" id="achievements-grid">
+            <!-- Los logros se cargan dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Contenido de Premios -->
+        <div class="tab-content" id="rewards-content">
+          <div class="rewards-header">
+            <h3>🎁 Sistema de Premios</h3>
+            <button class="add-btn" id="add-reward-btn">➕ Crear Premio</button>
+          </div>
+
+          <div class="rewards-grid" id="rewards-grid">
+            <!-- Los premios se cargan dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Estadísticas de Niveles y Logros -->
+        <div class="levels-stats">
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-content">
+              <h4>Total Niveles</h4>
+              <span id="total-levels">-</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-content">
+              <h4>Logros Activos</h4>
+              <span id="active-achievements">-</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎁</div>
+            <div class="stat-content">
+              <h4>Premios Otorgados</h4>
+              <span id="total-rewards">-</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-content">
+              <h4>Promedio Nivel</h4>
+              <span id="avg-student-level">-</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección: Analíticas -->
+      <section id="analytics-section" class="dashboard-section">
+        <div class="section-header">
+          <h2>📈 Analíticas Avanzadas</h2>
+          <button id="refresh-analytics" class="refresh-btn">
+            🔄 Actualizar
+          </button>
+        </div>
+
+        <!-- Filtros de Analíticas -->
+        <div class="analytics-filters">
+          <div class="filter-group">
+            <label for="analytics-period">Período:</label>
+            <select id="analytics-period">
+              <option value="week">Última semana</option>
+              <option value="month">Último mes</option>
+              <option value="quarter">Último trimestre</option>
+              <option value="all">Todo el tiempo</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="analytics-metric">Métrica:</label>
+            <select id="analytics-metric">
+              <option value="score">Puntuación</option>
+              <option value="accuracy">Precisión</option>
+              <option value="time">Tiempo promedio</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Gráficos de Analíticas -->
+        <div class="analytics-charts">
+          <div class="analytics-chart-container">
+            <h3>📊 Tendencia Temporal</h3>
+            <div class="chart-wrapper">
+              <canvas id="temporal-trend-chart"></canvas>
+            </div>
+          </div>
+          <div class="analytics-chart-container">
+            <h3>🎯 Análisis de Dificultad</h3>
+            <div class="chart-wrapper">
+              <canvas id="difficulty-analysis-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Métricas Detalladas -->
+        <div class="detailed-metrics">
+          <div class="metric-box">
+            <h4>📊 Estadísticas de Rendimiento</h4>
+            <div id="performance-stats">
+              <!-- Se carga dinámicamente -->
+            </div>
+          </div>
+          <div class="metric-box">
+            <h4>⏱️ Análisis de Tiempo</h4>
+            <div id="time-analysis">
+              <!-- Se carga dinámicamente -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="loading-spinner">
+        <div class="shark-loading">🦈</div>
+        <p>Cargando datos...</p>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

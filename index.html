@@ -1,65 +1,86 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sharky Aprende - Registro</title>
-  <link rel="stylesheet" href="estilos.css" />
-</head>
-<body>
-  <header>Sharky Aprende</header>
-  <div class="music-container">
-    <audio id="bgMusic" src="audio/audio1.mp3" loop></audio>
-    <button id="playBtn" class="music-btn">▶️ Play</button>
-    <button id="pauseBtn" class="music-btn">⏸️ Pausa</button>
-  </div>
-  <main>
-    <div id="roleSelector" class="role-selector">
-      <p class="role-title">¿Quién eres?</p>
-      <div class="role-buttons">
-        <button type="button" id="btnStudent" class="role-btn">👦 Soy Estudiante</button>
-        <button type="button" id="btnTeacher" class="role-btn">👩‍🏫 Soy Profesor</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shark Learns - Login & Registro</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Panel Izquierdo -->
+      <div class="left-panel">
+        <div class="mascota">
+          <img src="img/shark-logo.png" alt="Shark Logo" />
+          <h2>SHARK LEARNS</h2>
+          <p>¡Aprender es una aventura!</p>
+        </div>
+        <div class="roles">
+          <button data-role="student" class="active">🐠 Student</button>
+          <button data-role="teacher">🦈 Teacher</button>
+        </div>
+      </div>
+
+      <!-- Panel Derecho -->
+      <div class="right-panel">
+        <div class="tabs">
+          <button id="btnLogin" class="active">🔑 Login</button>
+          <button id="btnRegister">📝 Registro</button>
+        </div>
+
+        <div class="forms-container">
+          <!-- Login -->
+          <form id="formLogin" class="form active">
+            <input
+              id="login-email"
+              type="email"
+              placeholder="📧 Email"
+              required
+            />
+            <input
+              id="login-password"
+              type="password"
+              placeholder="🔒 Password"
+              required
+            />
+            <button type="submit" class="btn-action">🌊 LOGIN</button>
+          </form>
+
+          <!-- Registro -->
+          <form id="formRegistro" class="form">
+            <input
+              id="username"
+              type="text"
+              placeholder="👤 Username"
+              required
+            />
+            <div class="inline">
+              <input
+                id="password"
+                type="password"
+                placeholder="🔒 Password"
+                required
+              />
+              <input
+                id="confirm"
+                type="password"
+                placeholder="✅ Confirm"
+                required
+              />
+            </div>
+            <input id="email" type="email" placeholder="📧 Email" required />
+            <button type="submit" class="btn-action">🌟 REGISTER</button>
+          </form>
+        </div>
+
+        <p id="msg" class="msg"></p>
       </div>
     </div>
 
-   
-    <form id="userForm" autocomplete="off" class="hidden">
-      <label for="name">Ingresa tu nombre:</label>
-      <input type="text" id="name" name="name" placeholder="Escribe tu nombre" required minlength="2" />
-
-      <label>Selecciona un avatar:</label>
-      <div class="avatars" id="avatars">
-        <img src="images/avatar1.png" alt="" class="avatar" data-avatar="avatar1" tabindex="0" />
-        <img src="images/avatar2.png" alt="" class="avatar" data-avatar="avatar2" tabindex="0" />
-        <img src="images/avatar3.png" alt="" class="avatar" data-avatar="avatar3" tabindex="0" />
-        <img src="images/avatar4.png" alt="" class="avatar" data-avatar="avatar4" tabindex="0" />
-        <img src="images/avatar5.png" alt="" class="avatar" data-avatar="avatar5" tabindex="0" />
-        <img src="images/avatar6.png" alt="" class="avatar" data-avatar="avatar6" tabindex="0" />
-        <img src="images/avatar7.png" alt="" class="avatar" data-avatar="avatar7" tabindex="0" />
-        <img src="images/avatar8.png" alt="" class="avatar" data-avatar="avatar8" tabindex="0" />
-      </div>
-
-      <label for="grade">Selecciona tu grado:</label>
-      <select name="grade" id="grade" required>
-        <option value="" disabled selected>-- Elige tu grado --</option>
-        <option value="2do">2do de Primaria</option>
-        <option value="3ro">3ro de Primaria</option>
-      </select>
-
-      <button type="submit">Iniciar</button>
-    </form>
-
-    
-    <div id="teacherView" class="hidden teacher-view">
-      <h2>¡Bienvenido, profesor!</h2>
-      <p>
-        Aquí podrás gestionar y revisar los avances de tus estudiantes.<br>
-        
-      </p>
-    </div>
-
-    <div id="result" aria-live="polite"></div>
-  </main>
-  <script src="script.js"></script>
-</body>
+    <script src="js/app.js"></script>
+  </body>
 </html>

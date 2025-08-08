@@ -1,0 +1,478 @@
+/* Fuente y Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Baloo 2", cursive;
+}
+
+html {
+  /* Prevenir zoom en iOS */
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: url("../img/fondo-submarino.png") no-repeat center center;
+  background-size: cover;
+  background-attachment: scroll; /* Mejor performance en móviles */
+  overflow-x: hidden; /* Prevenir scroll horizontal */
+  position: relative;
+
+  /* Centrado principal */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: clamp(10px, 3vw, 20px);
+}
+
+/* Burbujas animadas */
+@keyframes bubble {
+  0% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh);
+    opacity: 0;
+  }
+}
+
+.bubble {
+  position: fixed; /* Fixed para evitar problemas de scroll */
+  bottom: -50px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  animation: bubble 8s linear infinite;
+  z-index: 0;
+  pointer-events: none; /* No interferir con interacciones */
+  /* Asegurar que las burbujas no salgan del viewport */
+  max-width: calc(100vw - 20px);
+}
+
+/* Contenedor principal */
+.container {
+  display: flex;
+  background: rgba(0, 41, 77, 0.9);
+  border-radius: clamp(15px, 3vw, 25px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  width: min(900px, 95vw);
+  max-width: 100%;
+  color: #fff;
+  z-index: 2;
+  backdrop-filter: blur(10px); /* Efecto moderno */
+  -webkit-backdrop-filter: blur(10px); /* Safari */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Panel izquierdo */
+.left-panel {
+  background: rgba(0, 80, 140, 0.9);
+  padding: clamp(15px, 4vw, 25px);
+  width: 35%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(15px, 3vw, 20px);
+}
+
+.left-panel .mascota img {
+  width: clamp(80px, 12vw, 120px);
+  height: auto;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.left-panel h2 {
+  margin: clamp(8px, 2vw, 12px) 0;
+  font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.left-panel p {
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  margin-bottom: clamp(8px, 2vw, 12px);
+  opacity: 0.9;
+}
+
+.roles {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 2vw, 12px);
+}
+
+.roles button {
+  display: block;
+  width: 100%;
+  padding: clamp(10px, 3vw, 15px);
+  border: none;
+  border-radius: clamp(12px, 3vw, 18px);
+  font-weight: bold;
+  cursor: pointer;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  background: linear-gradient(45deg, #00b4d8, #0077b6);
+  color: #fff;
+  transition: all 0.3s ease;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.roles button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.roles button:hover::before {
+  left: 100%;
+}
+
+.roles button:focus {
+  box-shadow: 0 0 0 3px rgba(242, 184, 75, 0.5);
+}
+
+.roles button.active,
+.roles button:hover {
+  background: linear-gradient(45deg, #f2b84b, #f29e38);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(242, 184, 75, 0.4);
+}
+
+/* Panel derecho */
+.right-panel {
+  padding: clamp(20px, 5vw, 40px);
+  width: 65%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(15px, 3vw, 25px);
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: clamp(5px, 1vw, 10px);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: clamp(12px, 3vw, 18px);
+  padding: 5px;
+}
+
+.tabs button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: clamp(10px, 2.5vw, 15px);
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: clamp(8px, 2vw, 12px);
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  transition: all 0.3s ease;
+  outline: none;
+  position: relative;
+}
+
+.tabs button:focus {
+  box-shadow: 0 0 0 2px rgba(242, 184, 75, 0.5);
+}
+
+.tabs button.active {
+  background: linear-gradient(45deg, #00b4d8, #0077b6);
+  color: #f2b84b;
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 180, 216, 0.3);
+}
+
+/* Formularios */
+.form {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.4s ease;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.form.active {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(0);
+  position: relative;
+}
+
+/* Contenedor para los formularios */
+.forms-container {
+  position: relative;
+  min-height: 200px; /* Altura mínima para evitar saltos */
+}
+
+form input {
+  display: block;
+  width: 100%;
+  padding: clamp(12px, 3vw, 16px);
+  margin-bottom: clamp(12px, 3vw, 18px);
+  border-radius: clamp(8px, 2vw, 12px);
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  transition: all 0.3s ease;
+  outline: none;
+  backdrop-filter: blur(5px);
+}
+
+form input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+form input:focus {
+  border-color: #00b4d8;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.3);
+  transform: translateY(-1px);
+}
+
+form input:invalid:not(:placeholder-shown) {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.3);
+}
+
+.inline {
+  display: flex;
+  gap: clamp(8px, 2vw, 12px);
+}
+
+.inline input {
+  flex: 1;
+}
+
+.btn-action {
+  display: block;
+  width: 100%;
+  padding: clamp(12px, 3vw, 18px);
+  border: none;
+  border-radius: clamp(12px, 3vw, 18px);
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  font-weight: bold;
+  cursor: pointer;
+  background: linear-gradient(45deg, #00b4d8, #0077b6);
+  color: #fff;
+  transition: all 0.3s ease;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+  margin-top: clamp(10px, 2vw, 15px);
+}
+
+.btn-action::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.btn-action:hover::before {
+  left: 100%;
+}
+
+.btn-action:focus {
+  box-shadow: 0 0 0 3px rgba(242, 184, 75, 0.5);
+}
+
+.btn-action:hover,
+.btn-action:focus {
+  background: linear-gradient(45deg, #f2b84b, #f29e38);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(242, 184, 75, 0.4);
+}
+
+.btn-action:active {
+  transform: translateY(0);
+}
+
+.msg {
+  text-align: center;
+  margin-top: clamp(8px, 2vw, 12px);
+  font-weight: bold;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  padding: clamp(8px, 2vw, 12px);
+  border-radius: clamp(6px, 1.5vw, 10px);
+  transition: all 0.3s ease;
+}
+
+/* --- Responsivo --- */
+
+/* Tablets grandes */
+@media (max-width: 992px) {
+  .container {
+    width: min(90vw, 800px);
+    gap: 15px;
+  }
+
+  .left-panel {
+    width: 40%;
+  }
+
+  .right-panel {
+    width: 60%;
+  }
+}
+
+/* Tablets verticales y teléfonos grandes */
+@media (max-width: 768px) {
+  body {
+    align-items: flex-start;
+    padding: clamp(10px, 3vw, 20px);
+    min-height: 100vh;
+  }
+
+  .container {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    border-radius: clamp(15px, 4vw, 25px);
+  }
+
+  .left-panel,
+  .right-panel {
+    width: 100%;
+  }
+
+  .left-panel {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    padding: clamp(15px, 4vw, 25px);
+  }
+
+  .left-panel .mascota {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: clamp(15px, 4vw, 25px);
+    flex-shrink: 0;
+  }
+
+  .left-panel .mascota img {
+    width: clamp(60px, 15vw, 80px);
+    margin-bottom: 8px;
+  }
+
+  .left-panel h2 {
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+    margin: 5px 0;
+  }
+
+  .left-panel p {
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    margin-bottom: 0;
+  }
+
+  .roles {
+    flex: 1;
+    flex-direction: row;
+    gap: clamp(8px, 2vw, 12px);
+  }
+
+  .roles button {
+    flex: 1;
+    padding: clamp(8px, 2vw, 12px);
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+  }
+
+  .tabs {
+    gap: 8px;
+    padding: 4px;
+  }
+
+  .tabs button {
+    padding: clamp(8px, 2vw, 12px);
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  }
+
+  .inline {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .inline input {
+    margin-bottom: clamp(12px, 3vw, 18px);
+  }
+}
+
+/* Teléfonos pequeños */
+@media (max-width: 480px) {
+  body {
+    padding: 8px;
+  }
+
+  .container {
+    border-radius: 15px;
+  }
+
+  .left-panel {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .left-panel .mascota {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .left-panel .mascota img {
+    width: clamp(50px, 12vw, 70px);
+  }
+
+  .roles {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .tabs {
+    padding: 3px;
+    gap: 4px;
+  }
+
+  .forms-container {
+    min-height: 180px;
+  }
+}
+
+/* Mejoras adicionales para pantallas muy pequeñas */
+@media (max-width: 320px) {
+  .left-panel .mascota img {
+    width: 45px;
+  }
+
+  .container {
+    border-radius: 12px;
+  }
+}
