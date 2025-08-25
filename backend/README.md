@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # 🦈 Sharky aprende API
 
 API REST para el juego educativo de matemáticas Sharky aprende con sistema de niveles, logros y premios.
+=======
+# 🦈 Shark Math Game API
+
+API REST para el juego educativo de matemáticas Shark Math Game con sistema de niveles, logros y premios.
+>>>>>>> cc00829 (Estructura base del proyecto: HTML, CSS, JS y recursos)
 
 ## 🚀 Características
 
