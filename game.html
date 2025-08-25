@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Math Shark - Aventura Matemática</title>
+    <link rel="stylesheet" href="css/game.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loading-content">
+        <div class="shark-loading">🦈</div>
+        <h2>Cargando Aventura...</h2>
+        <div class="loading-bar">
+          <div class="loading-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container" class="game-container hidden">
+      <!-- Game Header -->
+      <header class="game-header">
+        <div class="header-left">
+          <div class="logo">
+            <img src="img/shark-logo.png" alt="Shark" class="logo-img" />
+            <span class="game-title">Math Shark</span>
+          </div>
+        </div>
+        <div class="header-center">
+          <div class="question-display">
+            <span id="current-question">5 × 9 = ?</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <button
+            id="joystick-btn"
+            class="control-btn"
+            title="Conectar Joystick"
+          >
+            🕹️
+          </button>
+          <button id="pause-btn" class="control-btn">⏸️</button>
+          <button id="exit-btn" class="control-btn">🚪</button>
+        </div>
+      </header>
+
+      <!-- Game Stats -->
+      <div class="game-stats">
+        <div class="stat-item">
+          <span class="stat-icon">🏆</span>
+          <span class="stat-label">Puntos:</span>
+          <span id="score" class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">❤️</span>
+          <span class="stat-label">Vidas:</span>
+          <span id="lives" class="stat-value">3</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">⏱️</span>
+          <span class="stat-label">Tiempo:</span>
+          <span id="timer" class="stat-value">60</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🎯</span>
+          <span class="stat-label">Nivel:</span>
+          <span id="level" class="stat-value">1</span>
+        </div>
+      </div>
+
+      <!-- Game Canvas -->
+      <div class="game-area">
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+
+        <!-- Game Controls Info -->
+        <div class="controls-info">
+          <div class="control-hint">
+            <span class="key">↑↓←→</span>
+            <span class="hint-text">Mover</span>
+          </div>
+          <div class="control-hint">
+            <span class="key">ESPACIO</span>
+            <span class="hint-text">Pausa</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pause Modal -->
+    <div id="pause-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>⏸️ Juego Pausado</h2>
+        <div class="modal-buttons">
+          <button id="resume-btn" class="btn btn-primary">▶️ Continuar</button>
+          <button id="restart-btn" class="btn btn-secondary">
+            🔄 Reiniciar
+          </button>
+          <button id="quit-btn" class="btn btn-danger">🚪 Salir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="game-over-title">🎮 ¡Fin del Juego!</h2>
+        <div class="game-over-stats">
+          <div class="final-stat">
+            <span class="stat-icon">🏆</span>
+            <span class="stat-text">Puntuación Final:</span>
+            <span id="final-score" class="stat-number">0</span>
+          </div>
+          <div class="final-stat">
+            <span class="stat-icon">✅</span>
+            <span class="stat-text">Respuestas Correctas:</span>
+            <span id="correct-answers" class="stat-number">0</span>
+          </div>
+          <div class="final-stat">
+            <span class="stat-icon">❌</span>
+            <span class="stat-text">Respuestas Incorrectas:</span>
+            <span id="wrong-answers" class="stat-number">0</span>
+          </div>
+          <div class="final-stat">
+            <span class="stat-icon">⏱️</span>
+            <span class="stat-text">Tiempo Jugado:</span>
+            <span id="time-played" class="stat-number">0s</span>
+          </div>
+          <div class="final-stat">
+            <span class="stat-icon">🎯</span>
+            <span class="stat-text">Precisión:</span>
+            <span id="accuracy" class="stat-number">0%</span>
+          </div>
+        </div>
+        <div class="achievements" id="achievements-earned">
+          <!-- Logros desbloqueados se mostrarán aquí -->
+        </div>
+        <div class="modal-buttons">
+          <button id="play-again-btn" class="btn btn-primary">
+            🔄 Jugar de Nuevo
+          </button>
+          <button id="back-to-panel-btn" class="btn btn-secondary">
+            🏠 Volver al Panel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Joystick Connection Modal -->
+    <div id="joystick-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>🕹️ Conectar Joystick</h2>
+        <div class="joystick-connection">
+          <div class="connection-status">
+            <span id="connection-status">Desconectado</span>
+            <div id="connection-indicator" class="indicator disconnected"></div>
+          </div>
+          <div class="joystick-controls">
+            <p>Controles del Joystick:</p>
+            <ul>
+              <li>🕹️ Mover joystick: Controlar tiburón</li>
+              <li>🔘 Presionar botón: Pausar/Reanudar juego</li>
+            </ul>
+          </div>
+          <div class="connection-buttons">
+            <button id="connect-joystick" class="btn btn-primary btn-large">
+              🔌 Conectar Joystick
+            </button>
+            <button
+              id="disconnect-joystick"
+              class="btn btn-danger btn-large"
+              disabled
+            >
+              ❌ Desconectar
+            </button>
+          </div>
+        </div>
+        <div class="modal-buttons">
+          <button id="close-joystick-modal" class="btn btn-secondary">
+            ✖️ Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievement Notification -->
+    <div id="achievement-notification" class="achievement-notification hidden">
+      <div class="achievement-content">
+        <div class="achievement-icon">🏆</div>
+        <div class="achievement-text">
+          <div class="achievement-title">¡Logro Desbloqueado!</div>
+          <div id="achievement-name" class="achievement-name"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/game.js"></script>
+  </body>
+</html>

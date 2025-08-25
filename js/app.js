@@ -1,5 +1,6 @@
 const msg = document.getElementById("msg");
 const roles = document.querySelectorAll(".roles button");
+const rolesContainer = document.getElementById("rolesContainer");
 let selectedRole = "student";
 
 // Tabs
@@ -69,6 +70,8 @@ btnLogin.addEventListener("click", () => {
   btnRegister.classList.remove("active");
   formLogin.classList.add("active");
   formRegistro.classList.remove("active");
+  // Ocultar roles en login
+  rolesContainer.classList.add("hidden");
 });
 
 btnRegister.addEventListener("click", () => {
@@ -76,6 +79,8 @@ btnRegister.addEventListener("click", () => {
   btnLogin.classList.remove("active");
   formRegistro.classList.add("active");
   formLogin.classList.remove("active");
+  // Mostrar roles en registro
+  rolesContainer.classList.remove("hidden");
 });
 
 // Selección de roles
@@ -207,6 +212,9 @@ function showMessage(text, type) {
 
 // Verificar autenticación al cargar la página
 document.addEventListener("DOMContentLoaded", async () => {
+  // Ocultar roles por defecto (página inicia en login)
+  rolesContainer.classList.add("hidden");
+  
   if (apiUtils.isLoggedIn()) {
     try {
       // Verificar si el token sigue siendo válido

@@ -273,19 +273,108 @@ const dataManager = {
 
 // Funciones globales para eventos
 window.startGame = function () {
-  // Por ahora, mostrar un mensaje
-  alert("🎮 El juego está en desarrollo. ¡Pronto podrás jugar!");
-
-  // TODO: Aquí se implementaría la navegación al juego real
-  // window.location.href = 'game.html';
+  // Redirigir al juego Math Shark
+  window.location.href = 'game.html';
 };
 
+// Funciones del modal de perfil
 window.editProfile = function () {
-  // Por ahora, mostrar un mensaje
-  alert("✏️ Función de edición de perfil en desarrollo.");
-
-  // TODO: Implementar modal de edición de perfil
+  const modal = document.getElementById('profile-modal');
+  const form = document.getElementById('profile-form');
+  const user = apiUtils.getUser();
+  
+  if (user) {
+    // Prellenar el formulario con todos los datos actuales
+    document.getElementById('profile-name').value = user.name || '';
+    
+    // Si hay más campos en el futuro, se pueden agregar aquí
+    // Por ejemplo: email (aunque no está en el formulario actual)
+    // document.getElementById('profile-email').value = user.email || '';
+  }
+  
+  // Limpiar campos de contraseña
+  document.getElementById('current-password').value = '';
+  document.getElementById('new-password').value = '';
+  document.getElementById('confirm-password').value = '';
+  
+  modal.classList.add('active');
 };
+
+window.closeProfileModal = function () {
+  const modal = document.getElementById('profile-modal');
+  modal.classList.remove('active');
+};
+
+// Manejar envío del formulario de perfil
+async function handleProfileUpdate(event) {
+  event.preventDefault();
+  
+  const formData = new FormData(event.target);
+  const name = formData.get('name').trim();
+  const currentPassword = formData.get('currentPassword');
+  const newPassword = formData.get('newPassword');
+  const confirmPassword = formData.get('confirmPassword');
+  
+  // Validaciones
+  if (!name) {
+    alert('❌ El nombre de usuario es obligatorio');
+    return;
+  }
+  
+  if (!currentPassword) {
+    alert('❌ Debes ingresar tu contraseña actual para confirmar los cambios');
+    return;
+  }
+  
+  if (newPassword && newPassword !== confirmPassword) {
+    alert('❌ Las contraseñas nuevas no coinciden');
+    return;
+  }
+  
+  if (newPassword && newPassword.length < 6) {
+    alert('❌ La nueva contraseña debe tener al menos 6 caracteres');
+    return;
+  }
+  
+  try {
+    uiUtils.showLoading();
+    
+    // Preparar datos para enviar
+    const updateData = {
+      name: name,
+      currentPassword: currentPassword
+    };
+    
+    if (newPassword) {
+      updateData.newPassword = newPassword;
+    }
+    
+    // Enviar actualización al servidor
+    const response = await apiUtils.makeRequest('/users/me', {
+      method: 'PUT',
+      body: JSON.stringify(updateData)
+    });
+    
+    // Actualizar datos locales
+    const currentUser = apiUtils.getUser();
+    currentUser.name = name;
+    localStorage.setItem('user', JSON.stringify(currentUser));
+    
+    // Actualizar UI
+    studentState.currentUser = currentUser;
+    dataManager.loadMyProfile();
+    
+    // Cerrar modal y mostrar éxito
+    closeProfileModal();
+    alert('✅ Perfil actualizado correctamente');
+    
+  } catch (error) {
+    console.error('Error actualizando perfil:', error);
+    alert(`❌ Error al actualizar perfil: ${error.message}`);
+  } finally {
+    uiUtils.hideLoading();
+  }
+}
 
 // Inicialización del panel del estudiante
 async function initStudentPanel() {
@@ -327,6 +416,26 @@ function setupEventListeners() {
   document
     .querySelector(".welcome-card .play-btn")
     .addEventListener("click", startGame);
+
+  // Formulario de perfil
+  document.getElementById("profile-form").addEventListener("submit", handleProfileUpdate);
+
+  // Cerrar modal al hacer clic fuera de él
+  document.getElementById("profile-modal").addEventListener("click", (e) => {
+    if (e.target.id === "profile-modal") {
+      closeProfileModal();
+    }
+  });
+
+  // Cerrar modal con tecla Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const modal = document.getElementById("profile-modal");
+      if (modal.classList.contains("active")) {
+        closeProfileModal();
+      }
+    }
+  });
 }
 
 // Inicializar cuando se carga la página

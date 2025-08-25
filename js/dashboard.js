@@ -11,6 +11,7 @@ const dashboardState = {
   rankings: [],
   levels: [],
   achievements: [],
+  rewards: [],
   levelsStats: {},
   systemStats: {},
   chartData: {},
@@ -235,6 +236,19 @@ const dataManager = {
       console.error("❌ Error cargando logros:", error);
       dashboardState.achievements = [];
       this.updateAchievementsUI();
+    }
+  },
+
+  async loadRewards() {
+    try {
+      console.log("🔄 Cargando premios...");
+      const response = await apiUtils.makeRequest("/levels/rewards");
+      dashboardState.rewards = response.data.rewards || [];
+      this.updateRewardsUI();
+    } catch (error) {
+      console.error("❌ Error cargando premios:", error);
+      dashboardState.rewards = [];
+      this.updateRewardsUI();
     }
   },
 
@@ -754,6 +768,83 @@ const dataManager = {
     });
   },
 
+  updateRewardsUI() {
+    const container = document.getElementById("rewards-grid");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (!dashboardState.rewards || dashboardState.rewards.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🎁</div>
+          <h3>No hay premios configurados</h3>
+          <p>Crea premios para motivar a los estudiantes</p>
+        </div>
+      `;
+      return;
+    }
+
+    dashboardState.rewards.forEach((reward) => {
+      const statusClass = reward.is_active ? "active" : "inactive";
+      const statusText = reward.is_active ? "Activo" : "Inactivo";
+      const typeText = this.getRewardTypeText(reward.reward_type);
+
+      const rewardElement = document.createElement("div");
+      rewardElement.className = "reward-card";
+      rewardElement.innerHTML = `
+        <div class="reward-header">
+          <div class="reward-icon">🎁</div>
+          <div class="reward-info">
+            <h4>${reward.name}</h4>
+            <p>${reward.description || 'Sin descripción'}</p>
+          </div>
+        </div>
+        
+        <div class="reward-stats">
+          <div class="stat-item">
+            <span class="stat-label">Tipo</span>
+            <span class="stat-value">${typeText}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Valor</span>
+            <span class="stat-value">${reward.reward_value}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Puntos Requeridos</span>
+            <span class="stat-value">${reward.points_required}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Estado</span>
+            <span class="stat-value ${statusClass}">${statusText}</span>
+          </div>
+        </div>
+        
+        <div class="reward-actions">
+          <button class="action-btn edit-btn" onclick="editReward(${reward.id})">
+            ✏️ Editar
+          </button>
+          <button class="action-btn delete-btn" onclick="deleteReward(${reward.id})">
+            🗑️ Eliminar
+          </button>
+        </div>
+      `;
+
+      container.appendChild(rewardElement);
+    });
+  },
+
+  getRewardTypeText(type) {
+    const types = {
+      'points': 'Puntos',
+      'badge': 'Insignia',
+      'certificate': 'Certificado',
+      'privilege': 'Privilegio',
+      'physical': 'Físico'
+    };
+    return types[type] || type;
+  },
+
   updateLevelsStatsUI() {
     const stats = dashboardState.levelsStats;
 
@@ -762,7 +853,7 @@ const dataManager = {
     document.getElementById("active-achievements").textContent =
       stats.active_achievements || 0;
     document.getElementById("total-rewards").textContent =
-      stats.totalGranted || 0;
+      dashboardState.rewards?.length || 0;
     document.getElementById("avg-student-level").textContent = "N/A"; // Se puede calcular después
   },
 
@@ -1292,7 +1383,12 @@ const dataManager = {
 // Gestión de modales
 const modalManager = {
   show(modalId) {
-    document.getElementById(modalId).classList.add("active");
+    const modal = document.getElementById(modalId);
+    if (!modal) {
+      console.error('Modal no encontrado:', modalId);
+      return;
+    }
+    modal.classList.add("active");
   },
 
   hide(modalId) {
@@ -1409,10 +1505,408 @@ window.showStudentDetails = async function (studentId) {
   }
 };
 
-window.exportStudentData = function (studentId) {
-  // Implementar exportación (por ahora solo un placeholder)
-  alert("Función de exportación en desarrollo");
+// Funciones de exportación
+window.exportStudentData = async function (studentId) {
+  try {
+    uiUtils.showLoading();
+    
+    // Obtener datos del estudiante desde el backend
+    const response = await apiUtils.makeRequest(`/dashboard/export/${studentId}`);
+    
+    if (response.success) {
+      // Mostrar modal de opciones de exportación
+      showExportModal(response.data, 'student');
+    } else {
+      alert('Error al obtener los datos del estudiante');
+    }
+  } catch (error) {
+    console.error('Error exportando datos del estudiante:', error);
+    alert('Error al exportar los datos del estudiante');
+  } finally {
+    uiUtils.hideLoading();
+  }
 };
+
+window.exportAllStudents = async function () {
+  try {
+    uiUtils.showLoading();
+    
+    // Obtener datos de todos los estudiantes desde el backend
+    const response = await apiUtils.makeRequest('/dashboard/export');
+    
+    if (response.success) {
+      // Mostrar modal de opciones de exportación
+      showExportModal(response.data, 'all');
+    } else {
+      alert('Error al obtener los datos de los estudiantes');
+    }
+  } catch (error) {
+    console.error('Error exportando datos de estudiantes:', error);
+    alert('Error al exportar los datos de los estudiantes');
+  } finally {
+    uiUtils.hideLoading();
+  }
+};
+
+function showExportModal(data, type) {
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.id = 'export-modal';
+  
+  const title = type === 'student' ? 
+    `Exportar datos de ${data.student_info.name}` : 
+    `Exportar datos de ${data.total_count} estudiantes`;
+  
+  modal.innerHTML = `
+    <div class="modal-content export-modal-content">
+      <div class="modal-header">
+        <h3>${title}</h3>
+        <button class="modal-close" onclick="closeExportModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="export-options">
+          <h4>Selecciona el formato de exportación:</h4>
+          <div class="export-buttons">
+            <button class="export-format-btn csv-btn" onclick="exportToCSV('${type}')">
+              📊 Exportar como CSV
+              <small>Ideal para análisis en Excel</small>
+            </button>
+            <button class="export-format-btn pdf-btn" onclick="exportToPDF('${type}')">
+              📄 Exportar como PDF
+              <small>Ideal para reportes</small>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Guardar datos en variable global temporal
+  window.exportData = data;
+  window.exportType = type;
+}
+
+function closeExportModal() {
+  const modal = document.getElementById('export-modal');
+  if (modal) {
+    modal.remove();
+  }
+  delete window.exportData;
+  delete window.exportType;
+}
+
+window.exportToCSV = function(type) {
+  const data = window.exportData;
+  let csvContent = '';
+  let filename = '';
+  
+  if (type === 'student') {
+    // Exportar datos de un estudiante
+    const student = data.student_info;
+    const stats = data.summary_stats;
+    const games = data.all_games;
+    
+    filename = `estudiante_${student.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+    
+    // Información del estudiante
+    csvContent += 'INFORMACIÓN DEL ESTUDIANTE\n';
+    csvContent += `Nombre,${student.name}\n`;
+    csvContent += `Email,${student.email}\n`;
+    csvContent += `Fecha de registro,${new Date(student.created_at).toLocaleDateString('es-ES')}\n`;
+    csvContent += `Fecha de exportación,${new Date(data.export_date).toLocaleDateString('es-ES')}\n\n`;
+    
+    // Estadísticas generales
+    csvContent += 'ESTADÍSTICAS GENERALES\n';
+    csvContent += `Total de partidas,${stats.total_games}\n`;
+    csvContent += `Puntuación promedio,${stats.avg_score}\n`;
+    csvContent += `Mejor puntuación,${stats.best_score}\n`;
+    csvContent += `Precisión promedio,${stats.accuracy_percentage}%\n`;
+    csvContent += `Tiempo total jugado,${Math.round(stats.total_time_played / 60)} minutos\n\n`;
+    
+    // Historial de partidas
+    csvContent += 'HISTORIAL DE PARTIDAS\n';
+    csvContent += 'Fecha,Puntuación,Respuestas Correctas,Respuestas Incorrectas,Precisión,Duración (min)\n';
+    
+    games.forEach(game => {
+      const duration = Math.round(game.duration / 60);
+      const accuracy = game.total_questions > 0 ? ((game.correct_answers / game.total_questions) * 100).toFixed(1) : 0;
+      csvContent += `${new Date(game.played_at).toLocaleDateString('es-ES')},${game.score},${game.correct_answers},${game.wrong_answers},${accuracy}%,${duration}\n`;
+    });
+    
+  } else {
+    // Exportar datos de todos los estudiantes
+    filename = `todos_estudiantes_${new Date().toISOString().split('T')[0]}.csv`;
+    
+    csvContent += 'REPORTE DE TODOS LOS ESTUDIANTES\n';
+    csvContent += `Total de estudiantes,${data.total_count}\n`;
+    csvContent += `Fecha de exportación,${new Date(data.export_date).toLocaleDateString('es-ES')}\n\n`;
+    
+    // Encabezados
+    csvContent += 'Nombre,Email,Fecha de registro,Total partidas,Puntuación promedio,Mejor puntuación,Precisión promedio,Tiempo total (min)\n';
+    
+    // Datos de estudiantes
+    data.students.forEach(student => {
+      const totalTime = Math.round((student.stats?.total_time_played || student.total_time_played || 0) / 60);
+      const stats = student.stats || student;
+      csvContent += `${student.name},${student.email},${new Date(student.created_at).toLocaleDateString('es-ES')},${stats.total_games},${stats.avg_score},${stats.best_score || 0},${stats.accuracy_percentage}%,${totalTime}\n`;
+    });
+  }
+  
+  // Descargar archivo CSV
+  downloadFile(csvContent, filename, 'text/csv');
+  closeExportModal();
+};
+
+window.exportToPDF = function(type) {
+  const data = window.exportData;
+  
+  // Para PDF, vamos a crear un HTML que se puede imprimir
+  let htmlContent = '';
+  let filename = '';
+  
+  if (type === 'student') {
+    const student = data.student_info;
+    const stats = data.summary_stats;
+    const games = data.all_games;
+    
+    filename = `estudiante_${student.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+    
+    htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Reporte de ${student.name}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+          .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #3b82f6; padding-bottom: 20px; }
+          .section { margin-bottom: 25px; }
+          .section h3 { color: #3b82f6; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
+          .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+          .info-item { background: #f8fafc; padding: 10px; border-radius: 5px; }
+          .info-label { font-weight: bold; color: #374151; }
+          .info-value { color: #1f2937; }
+          table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+          th, td { border: 1px solid #d1d5db; padding: 8px; text-align: left; }
+          th { background-color: #f3f4f6; font-weight: bold; }
+          .stats-highlight { background: #dbeafe; padding: 15px; border-radius: 8px; margin: 15px 0; }
+          .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #6b7280; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🦈 Shark Learns - Reporte de Estudiante</h1>
+          <h2>${student.name}</h2>
+          <p>Generado el ${new Date().toLocaleDateString('es-ES')}</p>
+        </div>
+        
+        <div class="section">
+          <h3>📝 Información Personal</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Nombre:</div>
+              <div class="info-value">${student.name}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Email:</div>
+              <div class="info-value">${student.email}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Fecha de registro:</div>
+              <div class="info-value">${new Date(student.created_at).toLocaleDateString('es-ES')}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">ID de usuario:</div>
+              <div class="info-value">${student.id}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h3>📊 Estadísticas Generales</h3>
+          <div class="stats-highlight">
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Total de partidas:</div>
+                <div class="info-value">${stats.total_games}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Puntuación promedio:</div>
+                <div class="info-value">${stats.avg_score} puntos</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Mejor puntuación:</div>
+                <div class="info-value">${stats.best_score || 0} puntos</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Precisión promedio:</div>
+                <div class="info-value">${stats.accuracy_percentage}%</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Tiempo total jugado:</div>
+                <div class="info-value">${Math.round(stats.total_time_played / 60)} minutos</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h3>🎮 Historial de Partidas (Últimas ${Math.min(games.length, 20)})</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Puntuación</th>
+                <th>Correctas</th>
+                <th>Incorrectas</th>
+                <th>Precisión</th>
+                <th>Duración</th>
+              </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    games.slice(0, 20).forEach(game => {
+      const duration = Math.round(game.duration / 60);
+      const accuracy = game.total_questions > 0 ? ((game.correct_answers / game.total_questions) * 100).toFixed(1) : 0;
+      htmlContent += `
+              <tr>
+                <td>${new Date(game.played_at).toLocaleDateString('es-ES')}</td>
+                <td>${game.score}</td>
+                <td>${game.correct_answers}</td>
+                <td>${game.wrong_answers}</td>
+                <td>${accuracy}%</td>
+                <td>${duration} min</td>
+              </tr>
+      `;
+    });
+    
+    htmlContent += `
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="footer">
+          <p>Reporte generado por Shark Learns Dashboard</p>
+          <p>Fecha de exportación: ${new Date().toLocaleString('es-ES')}</p>
+        </div>
+      </body>
+      </html>
+    `;
+    
+  } else {
+    filename = `todos_estudiantes_${new Date().toISOString().split('T')[0]}.pdf`;
+    
+    htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Reporte de Todos los Estudiantes</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+          .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #3b82f6; padding-bottom: 20px; }
+          .section { margin-bottom: 25px; }
+          .section h3 { color: #3b82f6; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+          th, td { border: 1px solid #d1d5db; padding: 6px; text-align: left; }
+          th { background-color: #f3f4f6; font-weight: bold; }
+          .summary { background: #dbeafe; padding: 15px; border-radius: 8px; margin: 15px 0; }
+          .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #6b7280; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>🦈 Shark Learns - Reporte General</h1>
+          <h2>Todos los Estudiantes</h2>
+          <p>Generado el ${new Date().toLocaleDateString('es-ES')}</p>
+        </div>
+        
+        <div class="section">
+          <h3>📊 Resumen General</h3>
+          <div class="summary">
+            <p><strong>Total de estudiantes:</strong> ${data.total_count}</p>
+            <p><strong>Fecha de exportación:</strong> ${new Date(data.export_date).toLocaleDateString('es-ES')}</p>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h3>👥 Lista de Estudiantes</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Registro</th>
+                <th>Partidas</th>
+                <th>Promedio</th>
+                <th>Mejor</th>
+                <th>Precisión</th>
+                <th>Tiempo (min)</th>
+              </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    data.students.forEach(student => {
+      const totalTime = Math.round((student.stats?.total_time_played || student.total_time_played || 0) / 60);
+      const stats = student.stats || student;
+      htmlContent += `
+              <tr>
+                <td>${student.name}</td>
+                <td>${student.email}</td>
+                <td>${new Date(student.created_at).toLocaleDateString('es-ES')}</td>
+                <td>${stats.total_games}</td>
+                <td>${stats.avg_score}</td>
+                <td>${stats.best_score || 0}</td>
+                <td>${stats.accuracy_percentage}%</td>
+                <td>${totalTime}</td>
+              </tr>
+      `;
+    });
+    
+    htmlContent += `
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="footer">
+          <p>Reporte generado por Shark Learns Dashboard</p>
+          <p>Fecha de exportación: ${new Date().toLocaleString('es-ES')}</p>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+  
+  // Abrir en nueva ventana para imprimir como PDF
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(htmlContent);
+  printWindow.document.close();
+  
+  // Esperar a que se cargue y luego mostrar diálogo de impresión
+  printWindow.onload = function() {
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+  };
+  
+  closeExportModal();
+};
+
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+}
 
 // Filtro de búsqueda de estudiantes
 function setupStudentSearch() {
@@ -1448,6 +1942,7 @@ async function initDashboard() {
 
     // Configurar event listeners
     setupEventListeners();
+    setupLevelsEventListeners();
     modalManager.setupEventListeners();
     setupStudentSearch();
 
@@ -1457,6 +1952,10 @@ async function initDashboard() {
       dataManager.loadStudents(),
       dataManager.loadRanking(),
       dataManager.loadLevelsStats(),
+      dataManager.loadLevels(),
+      dataManager.loadAchievements(),
+      dataManager.loadRewards(),
+      dataManager.loadAnalytics(),
     ]);
   } catch (error) {
     console.error("Error inicializando dashboard:", error);
@@ -1514,6 +2013,11 @@ function setupEventListeners() {
     dataManager.loadLevelsStats();
   });
 
+  // Botón de exportar todos los estudiantes
+  document.getElementById("export-all-students").addEventListener("click", () => {
+    exportAllStudents();
+  });
+
   document.getElementById("refresh-analytics").addEventListener("click", () => {
     const period = document.getElementById("analytics-period").value;
     const metric = document.getElementById("analytics-metric").value;
@@ -1556,11 +2060,290 @@ function setupEventListeners() {
       } else if (tab === "achievements") {
         dataManager.loadAchievements();
       } else if (tab === "rewards") {
-        // Implementar carga de premios
-        console.log("Cargar premios");
+        dataManager.loadRewards();
       }
     });
   });
+}
+
+// ===== GESTIÓN DE NIVELES Y LOGROS =====
+
+// Funciones globales para niveles
+window.createLevel = async function() {
+  modalManager.show('level-modal');
+  document.getElementById('level-form').reset();
+  document.getElementById('level-modal-title').textContent = 'Crear Nuevo Nivel';
+  document.getElementById('level-id').value = '';
+};
+
+window.editLevel = async function(levelNumber) {
+  const level = dashboardState.levels.find(l => l.level_number === levelNumber);
+  if (!level) return;
+  
+  modalManager.show('level-modal');
+  document.getElementById('level-modal-title').textContent = 'Editar Nivel';
+  document.getElementById('level-id').value = level.level_number;
+  document.getElementById('level-number').value = level.level_number;
+  document.getElementById('level-title').value = level.title;
+  document.getElementById('level-description').value = level.description || '';
+  document.getElementById('level-experience').value = level.experience_required;
+  document.getElementById('level-points').value = level.rewards_points;
+  document.getElementById('level-icon').value = level.badge_icon;
+  document.getElementById('level-color').value = level.badge_color;
+};
+
+window.deleteLevel = async function(levelNumber) {
+  if (!confirm('¿Estás seguro de que deseas eliminar este nivel?')) return;
+  
+  try {
+    uiUtils.showLoading();
+    await apiUtils.makeRequest(`/levels/${levelNumber}`, {
+      method: 'DELETE'
+    });
+    
+    await dataManager.loadLevels();
+    await dataManager.loadLevelsStats();
+    alert('Nivel eliminado exitosamente');
+  } catch (error) {
+    console.error('Error eliminando nivel:', error);
+    alert('Error al eliminar el nivel');
+  } finally {
+    uiUtils.hideLoading();
+  }
+};
+
+// Funciones globales para logros
+window.createAchievement = async function() {
+  modalManager.show('achievement-modal');
+  document.getElementById('achievement-form').reset();
+  document.getElementById('achievement-modal-title').textContent = 'Crear Nuevo Logro';
+  document.getElementById('achievement-id').value = '';
+};
+
+window.editAchievement = async function(achievementId) {
+  const achievement = dashboardState.achievements.find(a => a.id === achievementId);
+  if (!achievement) return;
+  
+  modalManager.show('achievement-modal');
+  document.getElementById('achievement-modal-title').textContent = 'Editar Logro';
+  document.getElementById('achievement-id').value = achievement.id;
+  document.getElementById('achievement-name').value = achievement.name;
+  document.getElementById('achievement-description').value = achievement.description || '';
+  document.getElementById('achievement-icon').value = achievement.icon;
+  document.getElementById('achievement-criteria-type').value = achievement.criteria_type;
+  document.getElementById('achievement-criteria-value').value = achievement.criteria_value;
+  document.getElementById('achievement-points').value = achievement.points_reward;
+  document.getElementById('achievement-color').value = achievement.badge_color;
+  document.getElementById('achievement-active').checked = achievement.is_active;
+};
+
+window.deleteAchievement = async function(achievementId) {
+  if (!confirm('¿Estás seguro de que deseas eliminar este logro?')) return;
+  
+  try {
+    uiUtils.showLoading();
+    await apiUtils.makeRequest(`/levels/achievements/${achievementId}`, {
+      method: 'DELETE'
+    });
+    
+    await dataManager.loadAchievements();
+    await dataManager.loadLevelsStats();
+    alert('Logro eliminado exitosamente');
+  } catch (error) {
+    console.error('Error eliminando logro:', error);
+    alert('Error al eliminar el logro');
+  } finally {
+    uiUtils.hideLoading();
+  }
+};
+
+// Funciones para manejar formularios
+window.saveLevelForm = async function(event) {
+  event.preventDefault();
+  
+  const formData = new FormData(event.target);
+  const levelData = {
+    level_number: parseInt(formData.get('level_number')),
+    title: formData.get('title'),
+    description: formData.get('description'),
+    experience_required: parseInt(formData.get('experience_required')),
+    rewards_points: parseInt(formData.get('rewards_points')),
+    badge_icon: formData.get('badge_icon'),
+    badge_color: formData.get('badge_color')
+  };
+  
+  const levelId = formData.get('level_id');
+  const isEdit = levelId && levelId !== '';
+  
+  try {
+    uiUtils.showLoading();
+    
+    if (isEdit) {
+      await apiUtils.makeRequest(`/levels/${levelId}`, {
+        method: 'PUT',
+        body: JSON.stringify(levelData)
+      });
+    } else {
+      await apiUtils.makeRequest('/levels', {
+        method: 'POST',
+        body: JSON.stringify(levelData)
+      });
+    }
+    
+    modalManager.hide('level-modal');
+    await dataManager.loadLevels();
+    await dataManager.loadLevelsStats();
+    alert(isEdit ? 'Nivel actualizado exitosamente' : 'Nivel creado exitosamente');
+  } catch (error) {
+    console.error('Error guardando nivel:', error);
+    alert('Error al guardar el nivel');
+  } finally {
+    uiUtils.hideLoading();
+  }
+};
+
+window.saveAchievementForm = async function(event) {
+  event.preventDefault();
+  
+  const formData = new FormData(event.target);
+  const achievementData = {
+    name: formData.get('name'),
+    description: formData.get('description'),
+    icon: formData.get('icon'),
+    criteria_type: formData.get('criteria_type'),
+    criteria_value: parseInt(formData.get('criteria_value')),
+    points_reward: parseInt(formData.get('points_reward')),
+    badge_color: formData.get('badge_color'),
+    is_active: formData.get('is_active') === 'on'
+  };
+  
+  const achievementId = formData.get('achievement_id');
+  const isEdit = achievementId && achievementId !== '';
+  
+  try {
+    uiUtils.showLoading();
+    
+    if (isEdit) {
+      await apiUtils.makeRequest(`/levels/achievements/${achievementId}`, {
+        method: 'PUT',
+        body: JSON.stringify(achievementData)
+      });
+    } else {
+      await apiUtils.makeRequest('/levels/achievements', {
+        method: 'POST',
+        body: JSON.stringify(achievementData)
+      });
+    }
+    
+    modalManager.hide('achievement-modal');
+    await dataManager.loadAchievements();
+    await dataManager.loadLevelsStats();
+    alert(isEdit ? 'Logro actualizado exitosamente' : 'Logro creado exitosamente');
+  } catch (error) {
+    console.error('Error guardando logro:', error);
+    alert('Error al guardar el logro');
+  } finally {
+    uiUtils.hideLoading();
+  }
+};
+
+// Funciones globales para premios
+window.createReward = async function() {
+  modalManager.show('reward-modal');
+  document.getElementById('reward-form').reset();
+  document.getElementById('reward-modal-title').textContent = 'Crear Nuevo Premio';
+  document.getElementById('reward-id').value = '';
+};
+
+window.editReward = async function(rewardId) {
+  const reward = dashboardState.rewards.find(r => r.id === rewardId);
+  if (!reward) return;
+  
+  modalManager.show('reward-modal');
+  document.getElementById('reward-modal-title').textContent = 'Editar Premio';
+  document.getElementById('reward-id').value = reward.id;
+  document.getElementById('reward-name').value = reward.name;
+  document.getElementById('reward-description').value = reward.description || '';
+  document.getElementById('reward-type').value = reward.reward_type;
+  document.getElementById('reward-value').value = reward.reward_value;
+  document.getElementById('reward-points').value = reward.points_required;
+  document.getElementById('reward-active').checked = reward.is_active;
+};
+
+window.deleteReward = async function(rewardId) {
+  if (!confirm('¿Estás seguro de que deseas eliminar este premio?')) return;
+  
+  try {
+    uiUtils.showLoading();
+    await apiUtils.makeRequest(`/levels/rewards/${rewardId}`, {
+      method: 'DELETE'
+    });
+    
+    await dataManager.loadRewards();
+    await dataManager.loadLevelsStats();
+    alert('Premio eliminado exitosamente');
+  } catch (error) {
+    console.error('Error eliminando premio:', error);
+    alert('Error al eliminar el premio');
+  } finally {
+    uiUtils.hideLoading();
+  }
+};
+
+window.saveRewardForm = async function(event) {
+  event.preventDefault();
+  
+  const formData = new FormData(event.target);
+  const rewardData = {
+    name: formData.get('name'),
+    description: formData.get('description'),
+    reward_type: formData.get('reward_type'),
+    reward_value: formData.get('reward_value'),
+    points_required: parseInt(formData.get('points_required')),
+    is_active: formData.get('is_active') === 'on'
+  };
+  
+  const rewardId = formData.get('reward_id');
+  const isEdit = rewardId && rewardId !== '';
+  
+  try {
+    uiUtils.showLoading();
+    
+    if (isEdit) {
+      await apiUtils.makeRequest(`/levels/rewards/${rewardId}`, {
+        method: 'PUT',
+        body: JSON.stringify(rewardData)
+      });
+    } else {
+      await apiUtils.makeRequest('/levels/rewards', {
+        method: 'POST',
+        body: JSON.stringify(rewardData)
+      });
+    }
+    
+    modalManager.hide('reward-modal');
+    await dataManager.loadRewards();
+    await dataManager.loadLevelsStats();
+    alert(isEdit ? 'Premio actualizado exitosamente' : 'Premio creado exitosamente');
+  } catch (error) {
+    console.error('Error guardando premio:', error);
+    alert('Error al guardar el premio');
+  } finally {
+    uiUtils.hideLoading();
+  }
+};
+
+// Configurar event listeners para niveles y logros
+function setupLevelsEventListeners() {
+  // Botones para agregar
+  document.getElementById('add-level-btn')?.addEventListener('click', createLevel);
+  document.getElementById('add-achievement-btn')?.addEventListener('click', createAchievement);
+  document.getElementById('add-reward-btn')?.addEventListener('click', createReward);
+  
+  // Formularios
+  document.getElementById('level-form')?.addEventListener('submit', saveLevelForm);
+  document.getElementById('achievement-form')?.addEventListener('submit', saveAchievementForm);
+  document.getElementById('reward-form')?.addEventListener('submit', saveRewardForm);
 }
 
 // Inicializar cuando se carga la página

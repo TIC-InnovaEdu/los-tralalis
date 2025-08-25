@@ -122,6 +122,9 @@
             <button id="refresh-students" class="refresh-btn">
               🔄 Actualizar
             </button>
+            <button id="export-all-students" class="export-btn">
+              📊 Exportar Todos
+            </button>
           </div>
         </div>
 
@@ -421,6 +424,202 @@
         </div>
       </section>
     </main>
+
+    <!-- Modal para Niveles -->
+    <div id="level-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="level-modal-title">Crear Nuevo Nivel</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="level-form">
+            <input type="hidden" id="level-id" name="level_id">
+            
+            <div class="form-group">
+              <label for="level-number">Número de Nivel:</label>
+              <input type="number" id="level-number" name="level_number" required min="1">
+            </div>
+            
+            <div class="form-group">
+              <label for="level-title">Título:</label>
+              <input type="text" id="level-title" name="title" required maxlength="100">
+            </div>
+            
+            <div class="form-group">
+              <label for="level-description">Descripción:</label>
+              <textarea id="level-description" name="description" rows="3" maxlength="255"></textarea>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="level-experience">Experiencia Requerida:</label>
+                <input type="number" id="level-experience" name="experience_required" required min="0">
+              </div>
+              
+              <div class="form-group">
+                <label for="level-points">Puntos de Recompensa:</label>
+                <input type="number" id="level-points" name="rewards_points" required min="0">
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="level-icon">Icono:</label>
+                <input type="text" id="level-icon" name="badge_icon" placeholder="⭐" maxlength="10">
+              </div>
+              
+              <div class="form-group">
+                <label for="level-color">Color:</label>
+                <input type="color" id="level-color" name="badge_color" value="#3498db">
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" onclick="modalManager.hide('level-modal')">Cancelar</button>
+              <button type="submit" class="btn-primary">Guardar Nivel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Logros -->
+    <div id="achievement-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="achievement-modal-title">Crear Nuevo Logro</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="achievement-form">
+            <input type="hidden" id="achievement-id" name="achievement_id">
+            
+            <div class="form-group">
+              <label for="achievement-name">Nombre del Logro:</label>
+              <input type="text" id="achievement-name" name="name" required maxlength="100">
+            </div>
+            
+            <div class="form-group">
+              <label for="achievement-description">Descripción:</label>
+              <textarea id="achievement-description" name="description" rows="3" maxlength="255"></textarea>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="achievement-icon">Icono:</label>
+                <input type="text" id="achievement-icon" name="icon" placeholder="🏆" maxlength="10">
+              </div>
+              
+              <div class="form-group">
+                <label for="achievement-color">Color:</label>
+                <input type="color" id="achievement-color" name="badge_color" value="#f39c12">
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="achievement-criteria-type">Tipo de Criterio:</label>
+                <select id="achievement-criteria-type" name="criteria_type" required>
+                  <option value="games_played">Partidas Jugadas</option>
+                  <option value="score_reached">Puntuación Alcanzada</option>
+                  <option value="streak_days">Racha de Días</option>
+                  <option value="accuracy_percentage">Porcentaje de Precisión</option>
+                  <option value="total_points">Puntos Totales</option>
+                  <option value="level_reached">Nivel Alcanzado</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="achievement-criteria-value">Valor del Criterio:</label>
+                <input type="number" id="achievement-criteria-value" name="criteria_value" required min="1">
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="achievement-points">Puntos de Recompensa:</label>
+                <input type="number" id="achievement-points" name="points_reward" required min="1">
+              </div>
+              
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="achievement-active" name="is_active" checked>
+                  <span class="checkmark"></span>
+                  Logro Activo
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" onclick="modalManager.hide('achievement-modal')">Cancelar</button>
+              <button type="submit" class="btn-primary">Guardar Logro</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Premios -->
+    <div id="reward-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="reward-modal-title">Crear Nuevo Premio</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="reward-form">
+            <input type="hidden" id="reward-id" name="reward_id">
+            
+            <div class="form-group">
+              <label for="reward-name">Nombre del Premio:</label>
+              <input type="text" id="reward-name" name="name" required maxlength="100">
+            </div>
+            
+            <div class="form-group">
+              <label for="reward-description">Descripción:</label>
+              <textarea id="reward-description" name="description" rows="3" maxlength="255"></textarea>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reward-type">Tipo de Premio:</label>
+                <select id="reward-type" name="reward_type" required>
+                  <option value="points">Puntos</option>
+                  <option value="badge">Insignia</option>
+                  <option value="certificate">Certificado</option>
+                  <option value="privilege">Privilegio</option>
+                  <option value="physical">Físico</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="reward-value">Valor del Premio:</label>
+                <input type="text" id="reward-value" name="reward_value" required maxlength="100">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="reward-points">Puntos Requeridos:</label>
+              <input type="number" id="reward-points" name="points_required" required min="1" max="10000">
+            </div>
+            
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="reward-active" name="is_active" checked>
+                <span class="checkmark"></span>
+                Premio Activo
+              </label>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" onclick="modalManager.hide('reward-modal')">Cancelar</button>
+              <button type="submit" class="btn-primary">Guardar Premio</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">

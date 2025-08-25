@@ -103,6 +103,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: clamp(8px, 2vw, 12px);
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.roles.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .roles button {
